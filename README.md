@@ -1,172 +1,221 @@
-📄 README.md
 # 🧾 Invoice Extractor (RAG + LangChain + Streamlit)
 
-A Streamlit-based Invoice Data Extraction system built using 
-Retrieval-Augmented Generation (RAG), LangChain, FAISS, and HuggingFace models.
+A Retrieval-Augmented Generation (RAG) based Invoice Data Extraction system built using **LangChain, FAISS, HuggingFace, and Streamlit**.
 
-This project extracts structured invoice information from uploaded PDF invoices.
-
----
-
-## 🚀 Project Overview
-
-This application allows users to:
-
-- Upload one or multiple invoice PDFs
-- Process documents using a RAG pipeline
-- Extract structured invoice fields
-- Display results in a clean Streamlit interface
-
-It combines:
-
-- 🔎 PDF document loading
-- ✂️ Recursive text splitting
-- 🧠 Embedding generation
-- 📦 FAISS vector storage
-- 🤖 HuggingFace LLM generation
-- 🎯 Prompt-controlled field extraction
+⚠️ **Project Status: Currently Under Refactor (Not Fully Working)**
+This project is being actively upgraded to improve reliability, extraction accuracy, and architecture design.
 
 ---
 
-## 🏗️ Architecture
+## 🚀 Project Vision
 
-User Upload → PDF Loader → Text Splitter → Embeddings → FAISS → Retriever  
-→ Prompt Template → HuggingFace LLM → Structured Output
+The goal of this project is to build a robust invoice intelligence system that:
+
+* Accepts invoice PDFs
+* Processes them using a RAG pipeline
+* Extracts structured financial fields
+* Returns clean, machine-readable output
+
+This is not just a PDF parser — it is an attempt to build a **mini document-understanding pipeline** using modern LLM architecture.
 
 ---
 
-## 📌 Extracted Fields
+## 🏗️ Current Architecture
+
+User Upload
+→ PDF Loader
+→ Recursive Text Splitter
+→ Embedding Model (MiniLM)
+→ FAISS Vector Store
+→ Retriever
+→ Prompt Template
+→ HuggingFace LLM
+→ Field Extraction Output
+
+---
+
+## 📌 Target Extraction Fields
 
 The system attempts to extract:
 
-- Invoice Number
-- Invoice Date
-- Vendor Name
-- Subtotal
-- Tax
-- Total Amount
-- Payment Terms
+* Invoice Number
+* Invoice Date
+* Vendor Name
+* Subtotal
+* Tax
+* Total Amount
+* Payment Terms
 
-If a field is not found, the system returns:
+If a field cannot be confidently extracted:
 
-
+```
 Not found
-
+```
 
 ---
 
 ## 🛠️ Tech Stack
 
-- Python
-- Streamlit
-- LangChain
-- FAISS
-- HuggingFace Transformers
-- Sentence Transformers (all-MiniLM-L6-v2)
-- dotenv
+* Python
+* Streamlit
+* LangChain
+* FAISS
+* HuggingFace Transformers
+* Sentence Transformers (`all-MiniLM-L6-v2`)
+* dotenv
 
 ---
 
 ## 📂 Project Structure
 
-
+```
 invoice-extractor/
 │
-├── invoice_extractor.py # Streamlit App
-├── invoice_util.py # RAG + Extraction Pipeline
+├── invoice_extractor.py     # Streamlit Frontend
+├── invoice_util.py          # RAG + Extraction Logic
+├── requirements.txt
 ├── .gitignore
 ├── README.md
-
+```
 
 ---
 
 ## ⚙️ Installation
 
-### 1️⃣ Clone the repository
+### 1️⃣ Clone Repository
 
-
+```
 git clone https://github.com/someshbharathwaj-ops/invoice-extractor.git
-
 cd invoice-extractor
+```
 
+### 2️⃣ Create Virtual Environment
 
-### 2️⃣ Create virtual environment
-
-
+```
 python -m venv venv
-
+```
 
 Activate:
 
 Windows:
 
+```
 venv\Scripts\activate
-
+```
 
 Mac/Linux:
 
+```
 source venv/bin/activate
+```
 
+### 3️⃣ Install Dependencies
 
-### 3️⃣ Install dependencies
-
-
+```
 pip install -r requirements.txt
-
+```
 
 ---
 
-## ▶️ Run the Application
+## ▶️ Run Application
 
-
+```
 streamlit run invoice_extractor.py
-
-
----
-
-## ⚠️ Current Limitations
-
-- PDF parsing quality depends heavily on document structure.
-- Regex patterns are invoice-format dependent.
-- LLM output may vary.
-- Not optimized for production usage.
-- File saving is temporary and not cleaned automatically.
+```
 
 ---
 
-## 🎓 Academic Context
+## ⚠️ Current Issues (Honest Status)
 
-This project was developed as part of a Coursera learning exercise 
-focused on Retrieval-Augmented Generation (RAG) systems.
+The system is **not stable yet**. Known problems:
 
-The implementation is intentionally being improved incrementally to:
-- Understand commit history
-- Refactor architecture gradually
-- Improve PDF parsing quality
-- Enhance extraction reliability
+* PDF parsing fails for complex invoice layouts
+* RAG retrieval is inconsistent
+* LLM responses are not deterministic
+* Some invoices return incomplete fields
+* Chunking strategy needs redesign
+* Regex fallback logic is fragile
+* No structured JSON enforcement
+* No validation layer
+* Temporary files not auto-cleaned
+
+This repository reflects an **active learning and architecture improvement process**, not a final production system.
 
 ---
 
-## 🔮 Planned Improvements
+## 🎓 Learning Context
 
-- Improve PDF parsing robustness
-- Replace regex fallback logic
-- Add structured JSON output
-- Add logging system
-- Add Docker support
-- Add deployment (Streamlit Cloud / Render)
-- Replace distilgpt2 with stronger instruction model
-- Improve chunking strategy
+This project was originally developed after completing a Retrieval-Augmented Generation course on Coursera.
+
+It serves as:
+
+* A hands-on RAG experimentation environment
+* A sandbox for document intelligence
+* A portfolio project showing system design thinking
+* A base for future document AI systems
+
+---
+
+## 🔄 Upgrade Roadmap (Phase-wise)
+
+### Phase 1 — Stabilization
+
+* Improve PDF loader robustness
+* Redesign chunking strategy
+* Add structured JSON schema enforcement
+* Improve prompt design
+* Add logging
+
+### Phase 2 — Model Improvements
+
+* Replace `distilgpt2` with instruction-tuned LLM
+* Add structured output parser
+* Add confidence scoring
+* Improve retrieval relevance
+
+### Phase 3 — Production Readiness
+
+* Dockerize application
+* Add API layer (FastAPI)
+* Add persistent vector storage
+* Add automated cleanup
+* Add CI/CD
+* Deploy on Render / Streamlit Cloud
+
+### Phase 4 — Advanced Upgrade (Long-Term Vision)
+
+* Add layout-aware parsing (e.g., OCR + LayoutLM)
+* Add table extraction module
+* Multi-invoice batch processing
+* Analytics dashboard
+* Convert into SaaS-ready microservice
+
+---
+
+## 💡 Why Keep a “Broken” Project Public?
+
+Because engineering growth is visible in iteration.
+
+This repository shows:
+
+* RAG understanding
+* Vector database usage
+* Prompt engineering attempts
+* LLM integration
+* Real-world document challenges
+* Architecture refactoring journey
 
 ---
 
 ## 👨‍💻 Author
 
-Somesh Bharathwaj  
-GitHub: https://github.com/someshbharathwaj-ops
+Somesh Bharathwaj
+GitHub: [https://github.com/someshbharathwaj-ops](https://github.com/someshbharathwaj-ops)
+
+BS Data Science | AI Systems | RAG | Document Intelligence
 
 ---
 
 ## 📜 License
 
-This project is for educational purposes.
+Educational / Experimental Use Only
