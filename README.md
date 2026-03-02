@@ -1,4 +1,4 @@
-# 🧾 Invoice Extractor (RAG + LangChain + Streamlit)
+# 🧾 Invoice Extractor 
 
 A Retrieval-Augmented Generation (RAG) based Invoice Data Extraction system built using **LangChain, FAISS, HuggingFace, and Streamlit**.
 
