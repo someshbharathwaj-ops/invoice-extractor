@@ -45,11 +45,11 @@ def create_docs(uploaded_file):
     
 
 
-    hf_pipeline = pipeline(
-        "text-generation",
-        model="distilgpt2",
-        max_new_tokens=256
-    )
+    pipeline(
+       "text2text-generation",
+       model="google/flan-t5-base",
+       max_new_tokens=256
+)
 
     llm = HuggingFacePipeline(pipeline=hf_pipeline)
        
