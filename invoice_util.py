@@ -55,16 +55,10 @@ def create_docs(uploaded_file):
        
     prompt = PromptTemplate.from_template(
 """
-You are an invoice information extractor.
+Extract the following invoice information.
 
-ONLY extract the fields listed below.
-DO NOT add explanations.
-DO NOT repeat text.
-DO NOT invent fields.
+Return ONLY this format:
 
-Return ONLY the section between <START> and <END>.
-
-<START>
 Invoice Number:
 Invoice Date:
 Vendor Name:
@@ -72,9 +66,6 @@ Subtotal:
 Tax:
 Total Amount:
 Payment Terms:
-<END>
-
-If a field is missing, write "Not found".
 
 Invoice text:
 {context}
