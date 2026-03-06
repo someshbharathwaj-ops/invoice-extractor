@@ -1,9 +1,6 @@
 import streamlit as st
-from dotenv import load_dotenv
 import invoice_util as iu
 
-# Load environment once (even if unused now)
-load_dotenv()
 
 def main():
     st.set_page_config(
@@ -11,11 +8,11 @@ def main():
         layout="centered"
     )
 
-    st.title(" Invoice Data Extractor (RAG + LangChain)")
+    st.title("📄 Invoice Data Extractor (LangChain + LLM)")
 
     st.write(
-        "Upload a PDF invoice and extract structured invoice data using a "
-        "Retrieval-Augmented Generation (RAG) model."
+        "Upload a PDF invoice and automatically extract structured invoice "
+        "fields using an LLM-powered extraction pipeline."
     )
 
     uploaded_files = st.file_uploader(
@@ -25,22 +22,25 @@ def main():
     )
 
     if st.button("Extract Data"):
+
         if not uploaded_files:
             st.warning("Please upload at least one PDF file.")
             return
 
         for file in uploaded_files:
+
             with st.spinner(f"Extracting data from {file.name}..."):
+
                 try:
                     result = iu.create_docs(file)
 
-                    st.subheader(f"Extracted Data: {file.name}")
+                    st.subheader(f"📑 Extracted Data: {file.name}")
 
                     if result and result.strip():
-                        st.text(result)
+                        st.code(result)
                     else:
-                        st.text(
-                            """Invoice Number: Not found
+                        st.code(
+"""Invoice Number: Not found
 Invoice Date: Not found
 Vendor Name: Not found
 Subtotal: Not found
