@@ -1,9 +1,5 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_core.runnables import RunnablePassthrough
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_huggingface import HuggingFacePipeline
 from transformers import pipeline
 import re
@@ -21,17 +17,6 @@ def create_docs(uploaded_file):
     loader = PyPDFLoader(uploaded_file.name)
     documents = loader.load()
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 1200,
-        chunk_overlap = 300)
-    chunks = splitter.split_documents(documents)
-
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
-
-    vectorstore = FAISS.from_documents(chunks, embeddings)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 6})
 
     print("===== REGEX INPUT TEXT =====")
     context_text = "\n\n".join([doc.page_content for doc in chunks])
