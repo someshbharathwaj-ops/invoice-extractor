@@ -25,19 +25,20 @@ def create_docs(uploaded_file):
   
 
     def extract_invoice_fields(text):
-       def find(pattern):
-          m = re.search(pattern, text, re.IGNORECASE)
-          return m.group(1).strip() if m else "Not found"
 
-       return f"""
-      Invoice Number: {find(r"Invoice No\s*([A-Z0-9]+)")}
-     Invoice Date: {find(r"Invoice Date\s*([A-Za-z]+\s+\d{2},\s+\d{4})")}
-     Vendor Name: {find(r"Billed By\s*([\w\s]+)")}
-     Subtotal: {find(r"Amount\s*₹\s*([\d,]+\.\d{2})")}
-     Tax: {find(r"IGST\s*₹\s*([\d,]+\.\d{2})")}
-     Total Amount: {find(r"Total\s*\(INR\)\s*₹\s*([\d,]+\.\d{2})")}
-     Payment Terms: {find(r"Due Date\s*([A-Za-z]+\s+\d{2},\s+\d{4})")}
-     """.strip()
+        def find(pattern):
+           m = re.search(pattern, text, re.IGNORECASE)
+           return m.group(1).strip() if m else "Not found"
+
+    return f"""
+            Invoice Number: {find(r"Invoice\s*(?:No|Number|#|ID)[:\s]*([A-Z0-9\-]+)")}
+            Invoice Date: {find(r"Invoice\s*Date[:\s]*([A-Za-z]+\s+\d{1,2},\s+\d{4})")}
+            Vendor Name: {find(r"Billed\s*By[:\s]*([\w\s]+)")}
+            Subtotal: {find(r"Subtotal[:\s]*₹?\s*([\d,]+\.\d{2})")}
+            Tax: {find(r"(?:IGST|GST|Tax)[:\s]*₹?\s*([\d,]+\.\d{2})")}
+            Total Amount: {find(r"Total[:\s]*₹?\s*([\d,]+\.\d{2})")}
+            Payment Terms: {find(r"(?:Due\s*Date|Payment\s*Due)[:\s]*([A-Za-z]+\s+\d{1,2},\s+\d{4})")}
+            """.strip()
 
     context_text = "\n\n".join([doc.page_content for doc in documents])
     context_text = clean_text(context_text)
