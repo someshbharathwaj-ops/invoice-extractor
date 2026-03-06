@@ -39,7 +39,8 @@ def create_docs(uploaded_file):
      Payment Terms: {find(r"Due Date\s*([A-Za-z]+\s+\d{2},\s+\d{4})")}
      """.strip()
 
-
+    context_text = "\n\n".join([doc.page_content for doc in documents])
+    context_text = clean_text(context_text)
     
 
 
