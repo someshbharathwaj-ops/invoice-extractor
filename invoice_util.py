@@ -82,15 +82,8 @@ Invoice text:
     def format_docs(docs):
          return "\n\n".join(clean_text(doc.page_content) for doc in docs)
 
-    rag_pipeline = (
-    {
-        "context": retriever | format_docs,
-        "question": RunnablePassthrough()
-    }
-    | prompt
-    | llm
-    )
-
+    formatted_prompt = prompt.format(context=context_text)
+    raw_result = llm.invoke(formatted_prompt)
 
     raw_result = rag_pipeline.invoke("Extract invoice fields")
     clean_result = extract_clean_block(raw_result)
