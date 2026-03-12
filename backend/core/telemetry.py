@@ -3,6 +3,8 @@ from __future__ import annotations
 from contextlib import contextmanager
 from time import perf_counter
 
+from fastapi import FastAPI
+
 from backend.core.metrics import metrics_registry
 
 
@@ -13,3 +15,11 @@ def traced_span(name: str):
         yield
     finally:
         metrics_registry.observe(f"span.{name}", perf_counter() - started)
+
+
+def instrument_app(app: FastAPI) -> None:
+    try:
+        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+    except Exception:  # noqa: BLE001
+        return
+    FastAPIInstrumentor.instrument_app(app)

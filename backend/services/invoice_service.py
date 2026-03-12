@@ -66,7 +66,8 @@ class InvoiceService:
                     extractedAt=record.extractedAt,
                 )
             )
-        return sorted(records, key=lambda item: item.extractedAt or datetime.min, reverse=True)
+        floor = datetime.min.replace(tzinfo=UTC)
+        return sorted(records, key=lambda item: item.extractedAt or floor, reverse=True)
 
     def get_invoice(self, invoice_id: str) -> StoredInvoice:
         return invoice_repository.get(invoice_id)

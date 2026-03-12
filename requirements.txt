@@ -1,5 +1,12 @@
 streamlit
 python-dotenv
+fastapi
+uvicorn
+pydantic-settings
+python-multipart
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
 
 langchain
 langchain-core

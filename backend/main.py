@@ -10,6 +10,7 @@ from backend.config.settings import get_settings
 from backend.core.exceptions import AppError
 from backend.core.logging import configure_logging
 from backend.core.middleware import RateLimitMiddleware, RequestContextMiddleware
+from backend.core.telemetry import instrument_app
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestContextMiddleware)
     app.add_middleware(RateLimitMiddleware)
     app.include_router(api_router, prefix=settings.api_prefix)
+    instrument_app(app)
 
     @app.get("/")
     async def root():
