@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from datetime import UTC, datetime
 
 from backend.core.exceptions import NotFoundError
@@ -18,6 +19,7 @@ from backend.utils.ids import generate_id
 from backend.utils.parsing import extract_currency_number
 from backend.workers.queue import QueueJob, job_queue
 
+logger = logging.getLogger(__name__)
 
 STAGE_PROGRESS = {
     "ingest": 15,
@@ -49,45 +51,53 @@ class ProcessingService:
 
     async def _process_invoice(self, invoice_id: str, job_id: str) -> None:
         invoice = invoice_service.get_invoice(invoice_id)
-        await self._publish_status(invoice_id, job_id, "ingest", "processing", "Document queued for extraction.")
-        await asyncio.sleep(0.05)
-
-        result = await asyncio.to_thread(rag_pipeline.run, invoice_id, invoice.file_path)
-        parsed = result.parsed_fields
-
-        record = invoice.record.model_copy(
-            update={
-                "vendorName": parsed["Vendor Name"],
-                "invoiceNumber": parsed["Invoice Number"],
-                "invoiceDate": parsed["Invoice Date"],
-                "dueDate": parsed["Payment Terms"],
-                "subtotal": extract_currency_number(parsed["Subtotal"]),
-                "tax": extract_currency_number(parsed["Tax"]),
-                "totalAmount": extract_currency_number(parsed["Total Amount"]),
-                "paymentTerms": parsed["Payment Terms"],
-                "gstNumber": invoice.record.gstNumber,
-                "status": "processed" if result.confidence >= 90 else "review",
-                "confidence": result.confidence,
-                "summary": f"Processed invoice for {parsed['Vendor Name']}.",
-                "extractedAt": datetime.now(UTC),
-                "fields": result.fields,
-                "retrievedChunks": result.retrieved_chunks,
-                "reasoning": result.reasoning,
-            }
-        )
-        invoice.record = InvoiceRecord.model_validate(record)
-        invoice.fields = result.fields
-        invoice.retrieved_chunks = result.retrieved_chunks
-        invoice.reasoning = result.reasoning
-        invoice.diagnostics = {"latency_ms": result.latency_ms, "raw_output": result.raw_output}
-
-        for stage in ["chunk", "retrieve", "extract", "verify"]:
-            await self._publish_status(invoice_id, job_id, stage, "processing", f"{stage.title()} completed.")
+        try:
+            await self._publish_status(invoice_id, job_id, "ingest", "processing", "Document queued for extraction.")
             await asyncio.sleep(0.05)
 
-        invoice.record.status = "processed" if invoice.record.confidence >= 90 else "review"
-        invoice_service.save_invoice(invoice)
-        await self._publish_status(invoice_id, job_id, "verify", invoice.record.status, "Invoice processing complete.")
+            result = await asyncio.to_thread(rag_pipeline.run, invoice_id, invoice.file_path)
+            parsed = result.parsed_fields
+
+            record = invoice.record.model_copy(
+                update={
+                    "vendorName": parsed["Vendor Name"],
+                    "invoiceNumber": parsed["Invoice Number"],
+                    "invoiceDate": parsed["Invoice Date"],
+                    "dueDate": parsed["Payment Terms"],
+                    "subtotal": extract_currency_number(parsed["Subtotal"]),
+                    "tax": extract_currency_number(parsed["Tax"]),
+                    "totalAmount": extract_currency_number(parsed["Total Amount"]),
+                    "paymentTerms": parsed["Payment Terms"],
+                    "gstNumber": invoice.record.gstNumber,
+                    "status": "processed" if result.confidence >= 90 else "review",
+                    "confidence": result.confidence,
+                    "summary": f"Processed invoice for {parsed['Vendor Name']}.",
+                    "extractedAt": datetime.now(UTC),
+                    "fields": result.fields,
+                    "retrievedChunks": result.retrieved_chunks,
+                    "reasoning": result.reasoning,
+                }
+            )
+            invoice.record = InvoiceRecord.model_validate(record)
+            invoice.fields = result.fields
+            invoice.retrieved_chunks = result.retrieved_chunks
+            invoice.reasoning = result.reasoning
+            invoice.diagnostics = {"latency_ms": result.latency_ms, "raw_output": result.raw_output}
+
+            for stage in ["chunk", "retrieve", "extract", "verify"]:
+                await self._publish_status(invoice_id, job_id, stage, "processing", f"{stage.title()} completed.")
+                await asyncio.sleep(0.05)
+
+            invoice.record.status = "processed" if invoice.record.confidence >= 90 else "review"
+            invoice_service.save_invoice(invoice)
+            await self._publish_status(invoice_id, job_id, "verify", invoice.record.status, "Invoice processing complete.")
+        except Exception as error:
+            logger.exception("invoice_processing_failed", extra={"invoice_id": invoice_id, "job_id": job_id})
+            invoice.record.status = "failed"
+            invoice.record.summary = "Processing failed. Review diagnostics and retry."
+            invoice.diagnostics = {**invoice.diagnostics, "error": str(error)}
+            invoice_service.save_invoice(invoice)
+            await self._publish_status(invoice_id, job_id, "verify", "failed", "Invoice processing failed.")
 
     async def _publish_status(self, invoice_id: str, job_id: str, stage: str, status: str, message: str) -> None:
         payload = ProcessingStatus(
