@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 
 export function DashboardShell() {
   return (
-    <div className="space-y-6">
+    <div id="results" className="space-y-6 scroll-mt-24">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Results workspace</p>

@@ -29,7 +29,7 @@ export function ProcessingPanel() {
   const progress = stageMeta[processingStage].progress;
 
   return (
-    <Card>
+    <Card className="scroll-mt-24">
       <CardHeader className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <CardTitle>AI processing state</CardTitle>
