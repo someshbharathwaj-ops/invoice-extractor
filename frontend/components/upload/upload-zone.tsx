@@ -47,7 +47,7 @@ export function UploadZone() {
 
   const handleFiles = (incoming: FileList | null) => {
     if (!incoming) return;
-    setValue("files", Array.from(incoming), { shouldValidate: true });
+    setValue("files", Array.from(incoming), { shouldDirty: true, shouldTouch: true, shouldValidate: true });
   };
 
   return (
@@ -102,7 +102,7 @@ export function UploadZone() {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Button type="submit" size="lg" disabled={isProcessing}>
-                {isProcessing ? "Processing..." : "Run AI extraction"}
+                {isProcessing ? "Processing..." : files.length ? "Run AI extraction" : "Add PDFs to begin"}
               </Button>
               <Button type="button" variant="outline" size="lg" onClick={() => inputRef.current?.click()}>
                 Select files
