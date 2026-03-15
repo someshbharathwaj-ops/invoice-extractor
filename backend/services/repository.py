@@ -74,11 +74,13 @@ class InvoiceRepository:
 
         from backend.schemas.invoice import ExplainabilityStep, InvoiceField, ProcessingStatus, RetrievedChunk
 
-        invoice.created_at = datetime.fromisoformat(data["created_at"])  # type: ignore[arg-type]
-        invoice.processing_history = [ProcessingStatus.model_validate(item) for item in data["processing_history"]]  # type: ignore[index]
-        invoice.retrieved_chunks = [RetrievedChunk.model_validate(item) for item in data["retrieved_chunks"]]  # type: ignore[index]
-        invoice.reasoning = [ExplainabilityStep.model_validate(item) for item in data["reasoning"]]  # type: ignore[index]
-        invoice.fields = [InvoiceField.model_validate(item) for item in data["fields"]]  # type: ignore[index]
+        created_at = data.get("created_at")
+        if isinstance(created_at, str):
+            invoice.created_at = datetime.fromisoformat(created_at)
+        invoice.processing_history = [ProcessingStatus.model_validate(item) for item in data.get("processing_history", [])]  # type: ignore[arg-type]
+        invoice.retrieved_chunks = [RetrievedChunk.model_validate(item) for item in data.get("retrieved_chunks", [])]  # type: ignore[arg-type]
+        invoice.reasoning = [ExplainabilityStep.model_validate(item) for item in data.get("reasoning", [])]  # type: ignore[arg-type]
+        invoice.fields = [InvoiceField.model_validate(item) for item in data.get("fields", [])]  # type: ignore[arg-type]
         invoice.diagnostics = data.get("diagnostics", {})  # type: ignore[assignment]
         return invoice
 
