@@ -14,6 +14,9 @@ from backend.utils.ids import generate_id
 
 class InvoiceService:
     async def upload_files(self, files: list[UploadFile]) -> list[UploadJob]:
+        if not files:
+            return []
+
         uploads: list[UploadJob] = []
         for file in files:
             invoice_id, path, size_bytes = await file_storage_service.save_upload(file)
