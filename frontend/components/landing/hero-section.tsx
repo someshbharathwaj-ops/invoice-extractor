@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { featureCards, productStats } from "@/lib/constants";
 
+const pipelineSteps = [
+  { label: "Ingestion", icon: ShieldCheck },
+  { label: "Semantic chunking", icon: Sparkles },
+  { label: "Retriever scoring", icon: Zap },
+  { label: "Schema extraction", icon: ShieldCheck }
+] as const;
+
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden rounded-[2rem] border border-white/10 hero-mesh px-6 py-8 md:px-10 md:py-10">
@@ -91,18 +98,16 @@ export function HeroSection() {
                 <Badge>Live trace</Badge>
               </div>
               <div className="space-y-3">
-                {[
-                  ["Ingestion", ShieldCheck],
-                  ["Semantic chunking", Sparkles],
-                  ["Retriever scoring", Zap],
-                  ["Schema extraction", ShieldCheck]
-                ].map(([label, Icon]) => (
-                  <div key={label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                {pipelineSteps.map((step) => {
+                  const Icon = step.icon;
+
+                  return (
+                  <div key={step.label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
                     <div className="rounded-full bg-sky-400/10 p-2 text-sky-300">
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{label}</p>
+                      <p className="text-sm font-medium">{step.label}</p>
                       <div className="mt-2 h-1.5 rounded-full bg-white/10">
                         <motion.div
                           className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-300"
@@ -113,7 +118,8 @@ export function HeroSection() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
