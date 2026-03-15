@@ -18,6 +18,7 @@ invoiceparseRAG/
 ```bash
 cd frontend
 npm install
+npm run typecheck
 npm run dev
 ```
 
@@ -59,6 +60,15 @@ uvicorn backend.main:app --reload
 - request tracing, rate limiting, JSON logging, metrics, and OpenTelemetry hooks
 - legacy `invoice_util.create_docs()` compatibility through a backend adapter
 
+### Validation
+
+```bash
+python -m unittest discover -s tests -v
+cd frontend
+npm run lint
+npm run typecheck
+```
+
 ## Legacy Streamlit Path
 
 The original Streamlit entrypoint still exists for compatibility:
@@ -74,3 +84,4 @@ It now routes extraction through the refactored backend RAG pipeline adapter.
 - Frontend and backend are now separated into explicit application layers.
 - The frontend currently uses demo state and is ready to be wired to the FastAPI endpoints.
 - The backend API, RAG services, and diagnostics surface are implemented in the repository.
+- Upload validation, processing failure states, and system-level status summaries are covered by a lightweight smoke test suite in `tests/`.

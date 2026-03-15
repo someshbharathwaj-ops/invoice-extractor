@@ -36,3 +36,11 @@ dist/
 # Coverage
 .coverage
 htmlcov/
+
+# Frontend build artifacts
+frontend/.next/
+frontend/node_modules/
+*.tsbuildinfo
+
+# Accidental root Node lockfile
+/package-lock.json
