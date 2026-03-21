@@ -1,45 +1,67 @@
-# Invoice Extractor
+# Invoice Extractor RAG
 
-AI invoice extraction platform with a Next.js frontend and a production-style FastAPI backend built around a modular RAG pipeline.
+Invoice extraction workspace with a FastAPI backend, a Next.js frontend, and a modular retrieval-first parsing pipeline for PDF invoices.
 
-## Architecture
+## What is included
 
 ```text
 invoiceparseRAG/
-|-- backend/              # FastAPI app, services, schemas, RAG pipeline, workers
-|-- frontend/             # Next.js App Router frontend
+|-- backend/              # FastAPI app, services, schemas, queueing, RAG pipeline
+|-- frontend/             # Next.js App Router dashboard
+|-- tests/                # Backend smoke and regression tests
 |-- invoice_extractor.py  # Legacy Streamlit entrypoint
-|-- invoice_util.py       # Legacy adapter into the new RAG pipeline
+|-- invoice_util.py       # Legacy adapter into the backend pipeline
 |-- requirements.txt      # Python dependencies
 ```
 
-## Frontend
+## Highlights
+
+- FastAPI API for upload, processing, trace inspection, search, and system health.
+- Retrieval-first invoice pipeline with ingestion, chunking, embeddings, ranking, prompting, extraction, and validation stages.
+- Next.js dashboard with upload simulation, analytics, traceability views, and live backend status visibility.
+- Compatibility layer for the older Streamlit flow through `invoice_util.create_docs()`.
+- Lightweight backend test suite covering upload validation, processing failure handling, parser regressions, and system summaries.
+
+## Quick start
+
+### Backend
 
 ```bash
-cd frontend
-npm install
-npm run typecheck
-npm run dev
-```
-
-Frontend includes:
-
-- landing screen with animated hero
-- drag-and-drop invoice upload workspace
-- AI processing state visualization
-- results dashboard with structured fields, JSON, analytics, history, and compare flow
-- explainability panel for retrieved chunks and reasoning trace
-
-## Backend
-
-### Run the API
-
-```bash
+python -m venv venv
+venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn backend.main:app --reload
 ```
 
-### API surface
+The backend starts on `http://127.0.0.1:8000` by default.
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend starts on `http://127.0.0.1:3000`.
+
+## Environment
+
+The frontend reads:
+
+- `NEXT_PUBLIC_BACKEND_URL`
+
+Example:
+
+```bash
+set NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
+```
+
+If this variable is not set, the frontend assumes `http://127.0.0.1:8000`.
+
+Backend settings are loaded from `.env` with the `INVOICE_` prefix through `backend/config/settings.py`.
+
+## API surface
 
 - `POST /api/v1/invoices/upload`
 - `POST /api/v1/invoices/{invoice_id}/process`
@@ -51,37 +73,40 @@ uvicorn backend.main:app --reload
 - `GET /api/v1/rag/search`
 - `GET /api/v1/system/status`
 
-### Backend capabilities
+## Frontend behavior
 
-- FastAPI service architecture under `backend/`
-- modular RAG pipeline for ingestion, chunking, retrieval, prompting, extraction, and validation
-- async processing orchestration with queue abstraction
-- structured schemas and typed services
-- request tracing, rate limiting, JSON logging, metrics, and OpenTelemetry hooks
-- legacy `invoice_util.create_docs()` compatibility through a backend adapter
+- Upload validation now matches backend rules for PDF-only files up to 20 MB each.
+- The home page includes a live backend status panel.
+- `GET /api/health` on the frontend now includes backend reachability details for deployment checks.
+- The standalone typecheck config keeps `npm run typecheck` working even before `.next` build artifacts exist.
 
-### Validation
+## Validation
+
+Run these from the project root unless noted:
 
 ```bash
 python -m unittest discover -s tests -v
+```
+
+```bash
 cd frontend
 npm run lint
 npm run typecheck
+npm run build
 ```
 
-## Legacy Streamlit Path
+## Notes on extraction
 
-The original Streamlit entrypoint still exists for compatibility:
+- The parser now distinguishes `Due Date` from `Payment Terms`.
+- Upload storage creates missing target directories automatically.
+- The current frontend still uses demo invoice records for the dashboard tables while exposing live backend health information.
+
+## Legacy Streamlit path
+
+The original Streamlit entrypoint is still available:
 
 ```bash
 streamlit run invoice_extractor.py
 ```
 
-It now routes extraction through the refactored backend RAG pipeline adapter.
-
-## Status
-
-- Frontend and backend are now separated into explicit application layers.
-- The frontend currently uses demo state and is ready to be wired to the FastAPI endpoints.
-- The backend API, RAG services, and diagnostics surface are implemented in the repository.
-- Upload validation, processing failure states, and system-level status summaries are covered by a lightweight smoke test suite in `tests/`.
+It routes extraction through the refactored backend adapter path.
