@@ -63,7 +63,7 @@ class ProcessingService:
                     "vendorName": parsed["Vendor Name"],
                     "invoiceNumber": parsed["Invoice Number"],
                     "invoiceDate": parsed["Invoice Date"],
-                    "dueDate": parsed["Payment Terms"],
+                    "dueDate": parsed["Due Date"],
                     "subtotal": extract_currency_number(parsed["Subtotal"]),
                     "tax": extract_currency_number(parsed["Tax"]),
                     "totalAmount": extract_currency_number(parsed["Total Amount"]),
