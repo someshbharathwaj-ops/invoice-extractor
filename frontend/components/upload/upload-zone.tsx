@@ -11,13 +11,24 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { appConfig } from "@/lib/app-config";
 import { useInvoiceStore } from "@/store/use-invoice-store";
+
+const maxUploadSizeBytes = appConfig.maxUploadSizeMb * 1024 * 1024;
 
 const formSchema = z.object({
   files: z
     .array(z.custom<File>((value) => typeof File !== "undefined" && value instanceof File))
     .min(1, "Add at least one invoice PDF.")
-    .refine((files) => files.every((file) => file.type === "application/pdf"), "Only PDF files are supported.")
+    .refine(
+      (files) =>
+        files.every((file) => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")),
+      "Only PDF files are supported."
+    )
+    .refine(
+      (files) => files.every((file) => file.size <= maxUploadSizeBytes),
+      `Each file must be ${appConfig.maxUploadSizeMb} MB or smaller.`
+    )
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -97,7 +108,8 @@ export function UploadZone() {
             <div>
               <p className="font-display text-2xl">Drop invoice PDFs to start extraction</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Smart drag-and-drop, upload preview, and retrieval-ready processing trace.
+                Smart drag-and-drop, upload preview, and retrieval-ready processing trace for PDF files up to{" "}
+                {appConfig.maxUploadSizeMb} MB each.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
