@@ -13,6 +13,7 @@ Return ONLY this format:
 
 Invoice Number:
 Invoice Date:
+Due Date:
 Vendor Name:
 Subtotal:
 Tax:

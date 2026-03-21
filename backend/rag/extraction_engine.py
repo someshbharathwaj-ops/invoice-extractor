@@ -33,11 +33,12 @@ class ExtractionEngine:
         return (
             f"Invoice Number: {find(r'Invoice\\s*(?:No|Number|#|ID)[:\\s]*([A-Z0-9\\-]+)')}\n"
             f"Invoice Date: {find(r'Invoice\\s*Date[:\\s]*([A-Za-z0-9,\\-/ ]+)')}\n"
+            f"Due Date: {find(r'(?:Due\\s*Date|Payment\\s*Due)[:\\s]*([A-Za-z0-9,\\-/ ]+)')}\n"
             f"Vendor Name: {find(r'(?:Billed\\s*By|Vendor|From)[:\\s]*([\\w\\s.&,-]+)')}\n"
             f"Subtotal: {find(r'Subtotal[:\\s]*[^0-9]*([\\d,]+(?:\\.\\d{{2}})?)')}\n"
             f"Tax: {find(r'(?:IGST|CGST|SGST|GST|Tax)[:\\s]*[^0-9]*([\\d,]+(?:\\.\\d{{2}})?)')}\n"
             f"Total Amount: {find(r'(?:Grand\\s*Total|Total Amount|Total)[:\\s]*[^0-9]*([\\d,]+(?:\\.\\d{{2}})?)')}\n"
-            f"Payment Terms: {find(r'(?:Payment\\s*Terms|Due\\s*Date|Payment\\s*Due)[:\\s]*([A-Za-z0-9,\\-/ ]+)')}"
+            f"Payment Terms: {find(r'Payment\\s*Terms[:\\s]*([A-Za-z0-9,\\-/ ]+)')}"
         )
 
     def extract(self, prompt: str, fallback_text: str) -> str:

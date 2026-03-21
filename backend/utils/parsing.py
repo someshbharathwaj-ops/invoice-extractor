@@ -6,6 +6,7 @@ import re
 FIELD_PATTERNS = {
     "Invoice Number": r"Invoice Number:\s*(.+)",
     "Invoice Date": r"Invoice Date:\s*(.+)",
+    "Due Date": r"Due Date:\s*(.+)",
     "Vendor Name": r"Vendor Name:\s*(.+)",
     "Subtotal": r"Subtotal:\s*(.+)",
     "Tax": r"Tax:\s*(.+)",
