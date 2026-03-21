@@ -43,6 +43,22 @@ class UploadValidationTests(IsolatedAsyncioTestCase):
         self.assertEqual(size_bytes, len(b"%PDF-1.4 test"))
         self.assertFalse(saved_path.exists())
 
+    async def test_upload_creates_missing_upload_directory(self) -> None:
+        upload = build_upload("invoice.pdf", "application/pdf", b"%PDF-1.4 test")
+        temp_dir = Path("tests/.tmp_uploads_nested/more")
+        original_dir = file_storage_service.settings.uploads_dir
+        file_storage_service.settings.uploads_dir = temp_dir
+        try:
+            _, saved_path, size_bytes = await file_storage_service.save_upload(upload)
+        finally:
+            saved_path.unlink(missing_ok=True)
+            temp_dir.rmdir()
+            temp_dir.parent.rmdir()
+            file_storage_service.settings.uploads_dir = original_dir
+
+        self.assertEqual(size_bytes, len(b"%PDF-1.4 test"))
+        self.assertFalse(saved_path.exists())
+
 
 class ProcessingServiceTests(IsolatedAsyncioTestCase):
     async def test_failed_processing_marks_invoice_failed(self) -> None:

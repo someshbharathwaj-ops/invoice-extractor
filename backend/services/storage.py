@@ -23,6 +23,7 @@ class FileStorageService:
             raise ValidationError(f"File exceeds {self.settings.max_upload_size_mb} MB limit")
         invoice_id = generate_id("inv")
         path = self.settings.uploads_dir / f"{invoice_id}.pdf"
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(payload)
         return invoice_id, path, len(payload)
 
